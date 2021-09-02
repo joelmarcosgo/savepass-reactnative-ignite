@@ -34,6 +34,7 @@ export function RegisterLoginData() {
   const {
     control,
     handleSubmit,
+    reset,
     formState: {
       errors
     }
@@ -48,8 +49,26 @@ export function RegisterLoginData() {
     }
 
     const dataKey = '@savepass:logins';
-
     // Save data on AsyncStorage and navigate to 'Home' screen
+    try {
+      const data = await AsyncStorage.getItem(dataKey);
+      const dataFormated = data ? JSON.parse(data) : [];
+
+      const senhas = [
+        ...dataFormated,
+        newLoginData
+      ];
+
+      await AsyncStorage.setItem(dataKey, JSON.stringify(senhas));
+      Alert.alert("Sucesso", "Senha Cadastrada com Sucesso!");
+
+      reset();
+      navigate("Home");
+
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Erro. Não foi possível realizar o cadastro da senha.");
+    }
   }
 
   return (
@@ -67,7 +86,7 @@ export function RegisterLoginData() {
             name="service_name"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.service_name && errors.service_name.message 
             }
             control={control}
             autoCapitalize="sentences"
@@ -79,7 +98,7 @@ export function RegisterLoginData() {
             name="email"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.email && errors.email.message 
             }
             control={control}
             autoCorrect={false}
@@ -92,7 +111,7 @@ export function RegisterLoginData() {
             name="password"
             error={
               // Replace here with real content
-              'Has error ? show error message'
+              errors.password && errors.password.message 
             }
             control={control}
             secureTextEntry
